@@ -14,7 +14,7 @@ from utils import read_nii, generate_binary_masks, generate_HU_channels, save_al
 
 def main(args):
 	df = pd.read_csv(args.path_df)
-	df = df[df["diagnosis"]!="LUNG_CANCER"].reset_index(drop=True)
+	#df = df[df["diagnosis"]!="LUNG_CANCER"].reset_index(drop=True)
 
 	for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 		path_CT, path_SUV, path_SEG = row["CT"], row["SUV"], row["SEG"]
@@ -45,6 +45,7 @@ def main(args):
 
 		#Generate Collages for visualization
 		generate_SUV_CT_collage(SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, CT_arr, CT_arr_B, CT_arr_LT, CT_arr_AT, CT_arr_A, save_path_visualizations, pat_ID, scan_date, disease_type)
+		break
 
 
 if __name__ == "__main__":
