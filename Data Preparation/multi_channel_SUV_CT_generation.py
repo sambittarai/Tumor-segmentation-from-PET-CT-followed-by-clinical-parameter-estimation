@@ -24,7 +24,7 @@ def main(args):
 	for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 		path_CT, path_SUV, path_SEG = row["CT"], row["SUV"], row["SEG"]
 		pat_ID, scan_date = row["pat_ID"], row["scan_date"]
-		print(pat_ID)
+		#print(pat_ID)
 		disease_type = row["diagnosis"]
 
 		save_path_nii = os.path.join(args.output_path, "3D_CT_SUV_Data", pat_ID, scan_date)
