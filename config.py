@@ -6,8 +6,7 @@ def parse_args():
     #################################Common
 
     #Data Path
-    parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", help="Path containing all the Patient's Data.")
-    #parser.add_argument("--input_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions/PETCT_8ec13728df/10-14-1999-NA-PET-CT Ganzkoerper  primaer mit KM-64354", help="Path containing all the Patient's Data.")
+    parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", help="Path containing all the autoPET Data.")
     parser.add_argument("--df", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/DataFrame_with_Paths/df_final.csv", help="Path containing all the Patient's Data.")
     parser.add_argument("--MIP_directions", default=["coronal", "saggital"], help="Path containing all the Patient's Data.")
 
