@@ -8,17 +8,17 @@ import pandas as pd
 from tqdm import tqdm
 
 import sys
-sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/Framework')
+sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction')
 from config import parse_args
 #from utils import get_binary_masks, get_channels, read_nii, save_npy_nii, preprocess_CT_HU_values, generate_MIPs_PET, generate_MIPs_CT, generate_MIPs_Seg, save_MIP, create_collage, create_final_collage
 from utils import read_nii, generate_binary_masks, generate_HU_channels, save_all_nii, generate_SUV_CT_collage, generate_SUV_CT_collage
 
 def main(args):
 	df = pd.read_csv(args.df)
-	df = df[df["diagnosis"]=="NEGATIVE"].reset_index(drop=True)
+	#df = df[df["diagnosis"]=="NEGATIVE"].reset_index(drop=True)
 	#df = df[df["pat_ID"]=="PETCT_0223010e46"].reset_index(drop=True)
-	print("start to 250")
-	df = df[10:250].reset_index(drop=True)
+	#print("start to 250")
+	#df = df[10:250].reset_index(drop=True)
 	#df_new = df[df.pat_ID.isin(args.include_ids)].reset_index(drop=True)
 
 	for index, row in tqdm(df.iterrows(), total=df.shape[0]):
