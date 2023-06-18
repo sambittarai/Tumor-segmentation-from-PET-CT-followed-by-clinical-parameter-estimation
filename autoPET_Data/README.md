@@ -12,3 +12,6 @@ This directory contains autoPET data in the Data folder and the corresponding da
       - SUV.nii.gz
       - PET.nii.gz
       - SEG.nii.gz
+     
+## DataFrame
+* Please look into the dataframe directly for more information.
