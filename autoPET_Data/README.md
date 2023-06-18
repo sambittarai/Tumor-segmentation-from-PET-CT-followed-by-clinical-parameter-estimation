@@ -14,4 +14,10 @@ This directory contains autoPET data in the Data folder and the corresponding da
       - SEG.nii.gz
      
 ## DataFrame
+* This contains a dataframe whose columns are the following:
+  * pat_ID
+  * scan_date
+  * CT (path)
+  * SUV (path)
+  * SEG (path)
 * Please look into the dataframe directly for more information.
