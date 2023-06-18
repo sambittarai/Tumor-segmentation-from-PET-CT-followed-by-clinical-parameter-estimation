@@ -230,11 +230,12 @@ def create_final_collage(path, save_path, pat_ID):
     collage.save(os.path.join(save_path, pat_ID + ".jpg"))
 
 
-def generate_SUV_CT_collage(SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, CT_arr, CT_arr_B, CT_arr_LT, CT_arr_AT, CT_arr_A, save_path, pat_ID, scan_date, disease_type):
+def generate_SUV_CT_collage(args, SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, CT_arr, CT_arr_B, CT_arr_LT, CT_arr_AT, CT_arr_A, save_path, pat_ID, scan_date, disease_type):
     """
     B - Bone; LT - Lean Tissue; AT - Adipose Tissue; A - Air; L - Lesion
     """
-    save_path_MIP = os.path.join(save_path, "Visualization", "MIPs", pat_ID + "_" + scan_date)
+    #save_path_MIP = os.path.join(save_path, "Visualization", "MIPs", pat_ID + "_" + scan_date)
+    save_path_MIP = os.path.join(save_path, "MIPs", pat_ID + "_" + scan_date)
     if not os.path.exists(save_path_MIP):
         os.makedirs(save_path_MIP)
 
@@ -242,7 +243,9 @@ def generate_SUV_CT_collage(SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT,
     CT_arr_L = CT_arr*SEG_arr
     CT_arr_LT, CT_arr_AT, CT_arr_A, CT_arr_L = preprocess_CT_HU_values(CT_arr_LT), preprocess_CT_HU_values(CT_arr_AT), preprocess_CT_HU_values(CT_arr_A), preprocess_CT_HU_values(CT_arr_L)
 
-    MIP_types = ["coronal", "saggital"]
+    #MIP_types = ["coronal", "saggital"]
+    MIP_types = args.MIP_types
+
     for i in MIP_types:
         save_path_MIP_temp = os.path.join(save_path_MIP, i)
         if not os.path.exists(save_path_MIP_temp):
