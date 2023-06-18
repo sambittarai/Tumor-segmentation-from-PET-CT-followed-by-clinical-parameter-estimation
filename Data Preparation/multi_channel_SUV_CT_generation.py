@@ -10,7 +10,6 @@ from tqdm import tqdm
 import sys
 sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction')
 from config import parse_args
-#from utils import get_binary_masks, get_channels, read_nii, save_npy_nii, preprocess_CT_HU_values, generate_MIPs_PET, generate_MIPs_CT, generate_MIPs_Seg, save_MIP, create_collage, create_final_collage
 from utils import read_nii, generate_binary_masks, generate_HU_channels, save_all_nii, generate_SUV_CT_collage, generate_SUV_CT_collage
 
 def main(args):
@@ -24,7 +23,7 @@ def main(args):
 	for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 		path_CT, path_SUV, path_SEG = row["CT"], row["SUV"], row["SEG"]
 		pat_ID, scan_date = row["pat_ID"], row["scan_date"]
-		#print(pat_ID)
+		print(pat_ID)
 		disease_type = row["diagnosis"]
 
 		save_path_nii = os.path.join(args.output_path, "3D_CT_SUV_Data", pat_ID, scan_date)
@@ -50,7 +49,7 @@ def main(args):
 		save_all_nii(path_SUV, save_path_nii, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, "SUV")
 
 		#Generate Collages for visualization
-		generate_SUV_CT_collage(SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, CT_arr, CT_arr_B, CT_arr_LT, CT_arr_AT, CT_arr_A, save_path_visualizations, pat_ID, scan_date, disease_type)
+		generate_SUV_CT_collage(args, SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_arr_AT, SUV_arr_A, CT_arr, CT_arr_B, CT_arr_LT, CT_arr_AT, CT_arr_A, save_path_visualizations, pat_ID, scan_date, disease_type)
 		#break
 
 
