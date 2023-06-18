@@ -4,3 +4,5 @@ This directory contains autoPET data in the Data folder and the corresponding da
 
 ## autoPET_Data
 * In order to run the code successfully download your own copy of the data from the autoPET website (https://autopet.grand-challenge.org/Dataset/) and put it in this folder. Note that it follows the same structure as the original.
+* The data directory structure looks something like this:
+  - Patient ID
