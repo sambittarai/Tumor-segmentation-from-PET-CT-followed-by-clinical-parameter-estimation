@@ -15,8 +15,3 @@ This directory contains autoPET data in the Data folder and the corresponding da
      
 ## DataFrame
 * Please look into the dataframe directly for more information.
-
-| Column 1 Header | Column 2 Header | Column 3 Header |
-| -------------- | -------------- | -------------- |
-| Row 1, Col 1   | Row 1, Col 2   | Row 1, Col 3   |
-| Row 2, Col 1   | Row 2, Col 2   | Row 2, Col 3   |
