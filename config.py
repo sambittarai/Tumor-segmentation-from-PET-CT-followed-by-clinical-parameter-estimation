@@ -10,7 +10,7 @@ def parse_args():
     parser.add_argument("--df", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/DataFrame_with_Paths/df_final.csv", help="DataFrame path which contains the full path of CT, SUV, SEG, and other clinical information such as age, sex, diagnosis.")
     parser.add_argument("--MIP_types", default=["coronal", "saggital"], help="Projections along the particular directions for the purpose of visualization of the multi-channel SUV and CT projections.")
 
-    parser.add_argument("--output_path", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Data Preparation/Output", help="Path where output will be generated.")
+    parser.add_argument("--output_path", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Data Preparation/Output/Multi_channel_3D_SUV_CT", help="Path where output will be generated.")
 
     parser.add_argument("--bone_HU", default=[200], help="Bone HU limit (x > +200)")
     parser.add_argument("--lean_HU", default=[-29, 150], help="Lean tissue HU limit (-29 < x < +150)")
