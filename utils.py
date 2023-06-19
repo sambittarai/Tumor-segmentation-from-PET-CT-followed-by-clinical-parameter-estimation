@@ -6,6 +6,8 @@ import nibabel as nib
 from config import parse_args
 import cv2
 from PIL import Image
+import scipy.ndimage
+from tqdm import tqdm
 
 def read_nii(path):
     img = sitk.ReadImage(path)
@@ -18,22 +20,16 @@ def generate_binary_masks(CT_arr, args):
     Takes the CT image as input and generates the following binary masks based on its HU cut-off values:
     Bone, Lean Tissue, Adipose Tissue, Air
     """
-    #bone_mask = np.where(CT_arr > 200, 1, 0)
     bone_mask = np.where(CT_arr > args.bone_HU[0], 1, 0)
 
-    #lean_mask = np.where(CT_arr < -29, 0, CT_arr)
-    #lean_mask = np.where(lean_mask > 150, 0, lean_mask)
     lean_mask = np.where(CT_arr < args.lean_HU[0], 0, CT_arr)
     lean_mask = np.where(lean_mask > args.lean_HU[1], 0, lean_mask)
     lean_mask = np.where(lean_mask == 0, 0, 1)
 
-    #adipose_mask = np.where(CT_arr < -190, 0, CT_arr)
-    #adipose_mask = np.where(adipose_mask > -30, 0, adipose_mask)
     adipose_mask = np.where(CT_arr < args.adipose_HU[0], 0, CT_arr)
     adipose_mask = np.where(adipose_mask > args.adipose_HU[1], 0, adipose_mask)
     adipose_mask = np.where(adipose_mask == 0, 0, 1)
 
-    #air_mask = np.where(CT_arr < -191, 1, 0)
     air_mask = np.where(CT_arr < args.air_HU[0], 1, 0)
     return bone_mask, lean_mask, adipose_mask, air_mask
 
@@ -311,46 +307,162 @@ def generate_SUV_CT_collage(args, SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_a
 def preprocess_df(df, args):
     #Bone HU window
     df["SUV_bone"] = df["SUV"]
-    #df["SUV_bone"] = df["SUV_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["SUV_bone"] = df["SUV_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_bone"] = df["SUV_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["SUV_bone"] = df["SUV_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["SUV_bone"] = df["SUV_bone"].str.replace("SUV.nii.gz", "SUV_bone.nii.gz")
 
     df["CT_bone"] = df["CT"]
-    #df["CT_bone"] = df["CT_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["CT_bone"] = df["CT_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_bone"] = df["CT_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["CT_bone"] = df["CT_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["CT_bone"] = df["CT_bone"].str.replace("CTres.nii.gz", "CT_bone.nii.gz")
 
     #Lean HU window
     df["SUV_lean"] = df["SUV"]
-    #df["SUV_lean"] = df["SUV_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["SUV_lean"] = df["SUV_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_lean"] = df["SUV_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["SUV_lean"] = df["SUV_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["SUV_lean"] = df["SUV_lean"].str.replace("SUV.nii.gz", "SUV_lean_tissue.nii.gz")
 
     df["CT_lean"] = df["CT"]
-    #df["CT_lean"] = df["CT_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["CT_lean"] = df["CT_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_lean"] = df["CT_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["CT_lean"] = df["CT_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["CT_lean"] = df["CT_lean"].str.replace("CTres.nii.gz", "CT_lean_tissue.nii.gz")
 
     #Adipose HU window
     df["SUV_adipose"] = df["SUV"]
-    #df["SUV_adipose"] = df["SUV_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["SUV_adipose"] = df["SUV_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_adipose"] = df["SUV_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["SUV_adipose"] = df["SUV_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["SUV_adipose"] = df["SUV_adipose"].str.replace("SUV.nii.gz", "SUV_adipose_tissue.nii.gz")
 
     df["CT_adipose"] = df["CT"]
-    #df["CT_adipose"] = df["CT_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["CT_adipose"] = df["CT_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_adipose"] = df["CT_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["CT_adipose"] = df["CT_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["CT_adipose"] = df["CT_adipose"].str.replace("CTres.nii.gz", "CT_adipose_tissue.nii.gz")
 
     #Air HU window
     df["SUV_air"] = df["SUV"]
-    #df["SUV_air"] = df["SUV_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["SUV_air"] = df["SUV_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_air"] = df["SUV_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["SUV_air"] = df["SUV_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["SUV_air"] = df["SUV_air"].str.replace("SUV.nii.gz", "SUV_air.nii.gz")
 
     df["CT_air"] = df["CT"]
-    #df["CT_air"] = df["CT_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
-    df["CT_air"] = df["CT_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_air"] = df["CT_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    #df["CT_air"] = df["CT_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
     df["CT_air"] = df["CT_air"].str.replace("CTres.nii.gz", "CT_air.nii.gz")
 
     return df
+
+def preprocess_CT_HU_values(arr):
+    return arr - np.min(arr)
+
+def generate_MIPs_new(Data, suv_min, suv_max, intensity_type=None, img_type=None):
+    """
+    Generate MIPs for PET Data.
+    Maximum Intensity Projection
+    
+    Data - PET Data.
+    MIP - Maximum/Mean/Std Intensity Projection.
+    """
+    PET = Data
+    if img_type == "SUV":
+        PET = np.clip(Data, suv_min, suv_max)
+
+    if intensity_type == "maximum":
+        MIP_PET = np.max(PET, axis=1).astype("float")
+    elif intensity_type == "mean":
+        MIP_PET = np.mean(PET, axis=1).astype("float")
+    elif intensity_type == "std":
+        MIP_PET = np.std(PET, axis=1).astype("float")
+    elif intensity_type == "sum": 
+        MIP_PET = np.sum(PET, axis=1).astype("float")
+
+    MIP_PET = MIP_PET/np.max(MIP_PET)# Pixel Normalization, value ranges b/w (0,1).
+    MIP_PET = np.absolute(MIP_PET - np.amax(MIP_PET))
+    MIP_PET = cv2.rotate(MIP_PET, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    return MIP_PET
+
+def generate_MIPs_Seg_new(Data):
+    """
+    Generate MIPs for Segmentation Data.
+    
+    Data - Segmentation Mask.
+    """
+    MIP_Seg = np.max(Data, axis=1).astype("float")
+    #MIP_Seg = np.sum(Data, axis=1).astype("float")
+    MIP_Seg = cv2.rotate(MIP_Seg, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    return MIP_Seg
+
+def generate_all_MIPs_SUV(save_path, SUV, SUV_B, SUV_LT, SUV_AT, SUV_A, SEG, suv_min, suv_max, rot_min=-90, rot_max=90, rot_interval=1):
+    """
+    Generate rotating 2D MIPs along coronal direction from (-90, 90).
+    """
+    for i in tqdm(range(rot_min, rot_max+1, rot_interval)):
+        file_path = os.path.join(save_path, "SUV_MIP", str(i) + ".npy")
+        if not os.path.isfile(file_path):
+            print("angle: ", i)
+            suv_temp = scipy.ndimage.rotate(SUV, angle=i, axes=(0,1))
+            suv_b_temp = scipy.ndimage.rotate(SUV_B, angle=i, axes=(0,1))
+            suv_lt_temp = scipy.ndimage.rotate(SUV_LT, angle=i, axes=(0,1))
+            suv_at_temp = scipy.ndimage.rotate(SUV_AT, angle=i, axes=(0,1))
+            suv_a_temp = scipy.ndimage.rotate(SUV_A, angle=i, axes=(0,1))
+            seg_temp = scipy.ndimage.rotate(SEG, angle=i, axes=(0,1))
+
+            suv_MIP = generate_MIPs_new(suv_temp, suv_min, suv_max, intensity_type="maximum", img_type="SUV")
+            suv_b_MIP = generate_MIPs_new(suv_b_temp, suv_min, suv_max, intensity_type="maximum", img_type="SUV")
+            suv_lt_MIP = generate_MIPs_new(suv_lt_temp, suv_min, suv_max, intensity_type="maximum", img_type="SUV")
+            suv_at_MIP = generate_MIPs_new(suv_at_temp, suv_min, suv_max, intensity_type="maximum", img_type="SUV")
+            suv_a_MIP = generate_MIPs_new(suv_a_temp, suv_min, suv_max, intensity_type="maximum", img_type="SUV")
+            seg_MIP = generate_MIPs_Seg_new(seg_temp)
+
+            suv_MIP = suv_MIP[:,60:-60]
+            suv_b_MIP = suv_b_MIP[:,60:-60]
+            suv_lt_MIP = suv_lt_MIP[:,60:-60]
+            suv_at_MIP = suv_at_MIP[:,60:-60]
+            suv_a_MIP = suv_a_MIP[:,60:-60]
+            seg_MIP = seg_MIP[:,60:-60]
+
+            np.save(os.path.join(save_path, "SUV_MIP", str(i) + ".npy"), suv_MIP)
+            np.save(os.path.join(save_path, "SUV_bone", str(i) + ".npy"), suv_b_MIP)
+            np.save(os.path.join(save_path, "SUV_lean", str(i) + ".npy"), suv_lt_MIP)
+            np.save(os.path.join(save_path, "SUV_adipose", str(i) + ".npy"), suv_at_MIP)
+            np.save(os.path.join(save_path, "SUV_air", str(i) + ".npy"), suv_a_MIP)
+            np.save(os.path.join(save_path, "SEG", str(i) + ".npy"), seg_MIP)
+        #break
+
+def generate_all_MIPs_CT(save_path, CT, CT_B, CT_LT, CT_AT, CT_A, SEG, ct_min, ct_max, rot_min=-90, rot_max=90, rot_interval=1):
+    """
+    Generate rotating 2D MIPs along coronal direction from (-90, 90).
+    """
+    for i in tqdm(range(rot_min, rot_max+1, rot_interval)):
+        file_path = os.path.join(save_path, "CT_MIP", str(i) + ".npy")
+        if not os.path.isfile(file_path):
+            ct_temp = scipy.ndimage.rotate(CT, angle=i, axes=(0,1))
+            ct_b_temp = scipy.ndimage.rotate(CT_B, angle=i, axes=(0,1))
+            ct_lt_temp = scipy.ndimage.rotate(CT_LT, angle=i, axes=(0,1))
+            ct_at_temp = scipy.ndimage.rotate(CT_AT, angle=i, axes=(0,1))
+            ct_a_temp = scipy.ndimage.rotate(CT_A, angle=i, axes=(0,1))
+
+            ct_MIP = generate_MIPs_new(ct_temp, ct_min, ct_max, intensity_type="sum", img_type="CT")
+            ct_b_MIP = generate_MIPs_new(ct_b_temp, ct_min, ct_max, intensity_type="sum", img_type="CT")
+            ct_b_MIP = (ct_b_MIP - np.min(ct_b_MIP)) / (np.max(ct_b_MIP) - np.min(ct_b_MIP))
+
+            ct_lt_MIP = generate_MIPs_new(ct_lt_temp, ct_min, ct_max, intensity_type="sum", img_type="CT")
+            ct_lt_MIP = (ct_lt_MIP - np.min(ct_lt_MIP)) / (np.max(ct_lt_MIP) - np.min(ct_lt_MIP))
+
+            ct_at_MIP = generate_MIPs_new(ct_at_temp, ct_min, ct_max, intensity_type="sum", img_type="CT")
+            ct_at_MIP = (ct_at_MIP - np.min(ct_at_MIP)) / (np.max(ct_at_MIP) - np.min(ct_at_MIP))
+
+            ct_a_MIP = generate_MIPs_new(ct_a_temp, ct_min, ct_max, intensity_type="sum", img_type="CT")
+            ct_a_MIP = (ct_a_MIP - np.min(ct_a_MIP)) / (np.max(ct_a_MIP) - np.min(ct_a_MIP))
+
+            ct_MIP = ct_MIP[:,60:-60]
+            ct_b_MIP = ct_b_MIP[:,60:-60]
+            ct_lt_MIP = ct_lt_MIP[:,60:-60]
+            ct_at_MIP = ct_at_MIP[:,60:-60]
+            ct_a_MIP = ct_a_MIP[:,60:-60]
+
+            np.save(os.path.join(save_path, "CT_MIP", str(i) + ".npy"), ct_MIP)
+            np.save(os.path.join(save_path, "CT_bone", str(i) + ".npy"), ct_b_MIP)
+            np.save(os.path.join(save_path, "CT_lean", str(i) + ".npy"), ct_lt_MIP)
+            np.save(os.path.join(save_path, "CT_adipose", str(i) + ".npy"), ct_at_MIP)
+            np.save(os.path.join(save_path, "CT_air", str(i) + ".npy"), ct_a_MIP)
+        #break

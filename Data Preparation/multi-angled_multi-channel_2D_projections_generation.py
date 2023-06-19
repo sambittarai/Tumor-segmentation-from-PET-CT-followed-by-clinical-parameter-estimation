@@ -8,8 +8,7 @@ import os
 
 import sys
 sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction')
-#from utils import read_nii, generate_all_MIPs_SUV, generate_all_MIPs_CT, preprocess_df, preprocess_CT_HU_values
-from utils import preprocess_df
+from utils import preprocess_df, read_nii, preprocess_CT_HU_values, generate_all_MIPs_SUV, generate_all_MIPs_CT
 from config import parse_args
 
 def main(args):
