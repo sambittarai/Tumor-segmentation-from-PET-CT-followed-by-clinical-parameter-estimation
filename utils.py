@@ -307,3 +307,50 @@ def generate_SUV_CT_collage(args, SEG_arr, SUV_arr, SUV_arr_B, SUV_arr_LT, SUV_a
     path_s = os.path.join(save_path_MIP, "saggital")
     create_collage(path_c, path_s, path_collages)
     create_final_collage(path_collages, os.path.join(save_path, "Collages"), disease_type + "_" + pat_ID + "_" + scan_date)
+
+def preprocess_df(df, args):
+    #Bone HU window
+    df["SUV_bone"] = df["SUV"]
+    #df["SUV_bone"] = df["SUV_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["SUV_bone"] = df["SUV_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_bone"] = df["SUV_bone"].str.replace("SUV.nii.gz", "SUV_bone.nii.gz")
+
+    df["CT_bone"] = df["CT"]
+    #df["CT_bone"] = df["CT_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["CT_bone"] = df["CT_bone"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_bone"] = df["CT_bone"].str.replace("CTres.nii.gz", "CT_bone.nii.gz")
+
+    #Lean HU window
+    df["SUV_lean"] = df["SUV"]
+    #df["SUV_lean"] = df["SUV_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["SUV_lean"] = df["SUV_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_lean"] = df["SUV_lean"].str.replace("SUV.nii.gz", "SUV_lean_tissue.nii.gz")
+
+    df["CT_lean"] = df["CT"]
+    #df["CT_lean"] = df["CT_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["CT_lean"] = df["CT_lean"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_lean"] = df["CT_lean"].str.replace("CTres.nii.gz", "CT_lean_tissue.nii.gz")
+
+    #Adipose HU window
+    df["SUV_adipose"] = df["SUV"]
+    #df["SUV_adipose"] = df["SUV_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["SUV_adipose"] = df["SUV_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_adipose"] = df["SUV_adipose"].str.replace("SUV.nii.gz", "SUV_adipose_tissue.nii.gz")
+
+    df["CT_adipose"] = df["CT"]
+    #df["CT_adipose"] = df["CT_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["CT_adipose"] = df["CT_adipose"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_adipose"] = df["CT_adipose"].str.replace("CTres.nii.gz", "CT_adipose_tissue.nii.gz")
+
+    #Air HU window
+    df["SUV_air"] = df["SUV"]
+    #df["SUV_air"] = df["SUV_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["SUV_air"] = df["SUV_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["SUV_air"] = df["SUV_air"].str.replace("SUV.nii.gz", "SUV_air.nii.gz")
+
+    df["CT_air"] = df["CT"]
+    #df["CT_air"] = df["CT_air"].str.replace("/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", "/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Data_Preparation/Output/3D_CT_SUV_Data")
+    df["CT_air"] = df["CT_air"].str.replace(args.data_path, args.path_multi_channel_3D_CT_SUV)
+    df["CT_air"] = df["CT_air"].str.replace("CTres.nii.gz", "CT_air.nii.gz")
+
+    return df

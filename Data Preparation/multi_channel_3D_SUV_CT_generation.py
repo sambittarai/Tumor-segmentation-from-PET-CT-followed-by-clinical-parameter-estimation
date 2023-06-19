@@ -13,12 +13,13 @@ from config import parse_args
 from utils import read_nii, generate_binary_masks, generate_HU_channels, save_all_nii, generate_SUV_CT_collage, generate_SUV_CT_collage
 
 def main(args):
-	df = pd.read_csv(args.df)
+	df = pd.read_csv(args.path_df)
 	#df = df[df["diagnosis"]=="NEGATIVE"].reset_index(drop=True)
 	#df = df[df["pat_ID"]=="PETCT_0223010e46"].reset_index(drop=True)
 	#print("start to 250")
 	#df = df[10:250].reset_index(drop=True)
 	#df_new = df[df.pat_ID.isin(args.include_ids)].reset_index(drop=True)
+	output_path = args.path_multi_channel_3D_CT_SUV
 
 	for index, row in tqdm(df.iterrows(), total=df.shape[0]):
 		path_CT, path_SUV, path_SEG = row["CT"], row["SUV"], row["SEG"]
@@ -26,11 +27,11 @@ def main(args):
 		print(pat_ID)
 		disease_type = row["diagnosis"]
 
-		save_path_nii = os.path.join(args.output_path, "3D_CT_SUV_Data", pat_ID, scan_date)
+		save_path_nii = os.path.join(output_path, "3D_CT_SUV_Data", pat_ID, scan_date)
 		if not os.path.exists(save_path_nii):
 			os.makedirs(save_path_nii)
 
-		save_path_visualizations = os.path.join(args.output_path, "Visualization")
+		save_path_visualizations = os.path.join(output_path, "Visualization")
 		if not os.path.exists(save_path_visualizations):
 			os.makedirs(save_path_visualizations)
 

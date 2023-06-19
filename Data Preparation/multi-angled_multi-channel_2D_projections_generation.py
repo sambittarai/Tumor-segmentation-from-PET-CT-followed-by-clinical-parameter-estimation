@@ -7,17 +7,17 @@ import cv2
 import os
 
 import sys
-sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET')
-from utils import read_nii, generate_all_MIPs_SUV, generate_all_MIPs_CT, preprocess_df, preprocess_CT_HU_values
-#from utils_copy import read_nii, generate_all_MIPs_SUV, generate_all_MIPs_CT, preprocess_df, preprocess_CT_HU_values
+sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction')
+#from utils import read_nii, generate_all_MIPs_SUV, generate_all_MIPs_CT, preprocess_df, preprocess_CT_HU_values
+from utils import preprocess_df
 from config import parse_args
 
 def main(args):
-	path_data = args.data_path
-	path_output = args.path_data_MIPs
+	#path_data = args.data_path
+	path_output = args.path_multi_angled_multi_channel_2D_projections
 	df = pd.read_csv(args.path_df) #DataFrame containing all the original tumorous scans.
-	df = df[df["diagnosis"]=="NEGATIVE"].reset_index(drop=True)
-	df = preprocess_df(df)
+	#df = df[df["diagnosis"]=="NEGATIVE"].reset_index(drop=True)
+	df = preprocess_df(df, args)
 	#print("151 to end")
 	#df = df[151:].reset_index(drop=True)
 
