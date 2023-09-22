@@ -1,4 +1,4 @@
-# Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction
+# Tumor-segmentation-from-PET-CT-followed-by-clinical-parameter-estimation
 The overall framework has two primary modules: [1] Tumor segmentation from PET/CT using segmentation prior; [2] Clinical parameter estimation (Regression and Classification) from multi-channel PET/CT projections.
 
 ## Directories
