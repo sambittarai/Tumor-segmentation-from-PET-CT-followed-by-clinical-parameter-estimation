@@ -7,7 +7,7 @@ import cv2
 import os
 
 import sys
-sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction')
+sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Clinical parameter estimation')
 #from utils import read_nii, generate_all_MIPs_SUV, generate_all_MIPs_CT, preprocess_df
 from config import parse_args
 

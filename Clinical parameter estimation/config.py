@@ -6,24 +6,20 @@ def parse_args():
     #################################Common
 
     #Data Path
-    parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", help="Path containing all the Patient's Data.")
-    parser.add_argument("--data_path_MIPs", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Data_preparation/Output/Multi_directional_2D_MIPs", help="Path containing all the Patient's Data.")
-    #parser.add_argument("--data_path_MIPs_collages", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages", help="Path containing all the Patient's Data.")
-    parser.add_argument("--data_path_MIPs_collages", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[-45, +45]", help="Path containing all the Patient's Data.")
+    #parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", help="Path containing all the Patient's Data.")
+    parser.add_argument("--data_path_MIPs", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Data Preparation/Output/Multi-angled_multi-channel_2D_projections", help="Path containing multi-channel PET/CT projections from different angles for all the patients.")
+    parser.add_argument("--data_path_MIPs_collages", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Clinical parameter estimation/Data_Pre-processing/Output/MIPs_collages", help="Path containing multi-channel PET/CT collages of coronal and sagittal projections for all the patients.")
 
-    #parser.add_argument("--data_path_MIPs_collages_new", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512", help="Path containing all the Patient's Data.")
-
-    parser.add_argument("--include_angles_collages", default=[-45, 45], help="Only include Multi_directional_2D_MIPs corresponding to the following angles in generating the collages followed by outcome prediction.")
+    parser.add_argument("--include_angles_collages", default=[0, 90], help="Only include the provided angles during the generation of collages.")
 
     #DataFrame
     parser.add_argument("--path_df", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/DataFrame_with_Paths/df_final.csv", help="DataFrame containing path of all the patients.")
     parser.add_argument("--path_df_rot_mips", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/df_rot_mips.csv", help="DataFrame with rotating mips path.")
-    #parser.add_argument("--path_df_rot_mips_collages", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/df_rot_mips_collages.csv", help="DataFrame with rotating mips path.")
     parser.add_argument("--path_df_rot_mips_collages", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/df_rot_mips_collages_512_512.csv", help="DataFrame with rotating mips path.")
 
     parser.add_argument("--rotation_min", default=-90, help="Minimum angle by which the MIP will be roated.")
     parser.add_argument("--rotation_max", default=90, help="Maximum angle by which the MIP will be rotated.")
-    parser.add_argument("--rotation_interval", default=20, help="Degrees by which the MIP will be rotated each time.")
+    parser.add_argument("--rotation_interval", default=10, help="Degrees by which the MIP will be rotated each time.")
 
     parser.add_argument("--path_CV_Output", default="/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Cross_Validation/Output/Classification/Disease_Type/Binary/Experiment_3", help="Cross Validation Output.")
 
