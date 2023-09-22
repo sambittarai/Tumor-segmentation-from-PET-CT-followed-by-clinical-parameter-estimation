@@ -2,13 +2,9 @@
 The overall framework has two primary modules: [1] Tumor segmentation from PET/CT using segmentation prior; [2] Clinical parameter estimation (Regression and Classification) from multi-channel PET/CT projections.
 
 ## Directories
-[1] autoPET_Data: This repository contains the original autoPET data. The directory contains a list of patient which then includes a list of scan dates for each of the patient. The directory structure looks like this:
-   - Patient_ID
-      - Scan_Date
-         - CT.nii.gz (Original CT scan)
-         - CTres.nii.gz (Resampled CT scan)
-         - SUV.nii.gz (Resampled SUV scan)
-         - SEG.nii.gz (Tumor segmentation)
+[1] autoPET_Data: This directory should include the original autoPET data, maintaining a directory structure similar to how it was initially provided. Please check the directory to know more about it.
+
+[2] Data Preparation: Checkout this directory to know more about the initial data preparation step.
 
 ## Files
 [1] config.py: Contains information about all the hyperparameters.
