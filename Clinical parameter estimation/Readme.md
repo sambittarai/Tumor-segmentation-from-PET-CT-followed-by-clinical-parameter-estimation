@@ -8,4 +8,4 @@
 [2] Data Pre-processing
 * Third, run "generate_df_multi_angled_multi_channel_projections.py" which is in the following directory: "Tumor-segmentation-from-PET-CT-followed-by-clinical-parameter-estimation/Clinical parameter estimation/Data Preprocessing".
 * Fourth, run "create_collage.py" which is in the following directory: "Tumor-segmentation-from-PET-CT-followed-by-clinical-parameter-estimation/Clinical parameter estimation/Data Preprocessing".
-* Fifth, run 
+* Fifth, run "preprocess_collages_512_512.py" which is in the following directory: "Tumor-segmentation-from-PET-CT-followed-by-clinical-parameter-estimation/Clinical parameter estimation/Data Preprocessing".
