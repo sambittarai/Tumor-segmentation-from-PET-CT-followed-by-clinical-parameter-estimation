@@ -23,8 +23,8 @@ from tabulate import tabulate
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
 
-import sys
-sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Cross_Validation')
+#import sys
+#sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Cross_Validation')
 from create_dataset import prepare_data
 
 def read_nii(path):
