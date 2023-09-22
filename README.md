@@ -6,6 +6,8 @@ The overall framework has two primary modules: [1] Tumor segmentation from PET/C
 
 [2] Data Preparation: Checkout this directory to know more about the initial data preparation step.
 
+[3] Tumor Segmentation: Checkout this directory to know more about tumor segmentation using prior with detailed step by step guide.
+
 ## Files
 [1] config.py: Contains information about all the hyperparameters.
 [2] utils.py: Contains all the helper functions.
