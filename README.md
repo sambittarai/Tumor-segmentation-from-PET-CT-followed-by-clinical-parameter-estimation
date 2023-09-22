@@ -1,5 +1,5 @@
 # Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction
-The overall framework has two primary modules: [1] Tumor segmentation from PET/CT using segmentation prior; [2] Outcome prediction from PET/CT 2D projections.
+The overall framework has two primary modules: [1] Tumor segmentation from PET/CT using segmentation prior; [2] Clinical parameter estimation (Regression and Classification) from multi-channel PET/CT projections.
 
 ## Directories
 [1] Original_Data: This repository contains the original autoPET data. The directory contains a list of patient which then includes a list of scan dates for each of the patient. The directory structure looks like this:
