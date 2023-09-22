@@ -4,4 +4,5 @@
 
 * First, run "multi_channel_SUV_CT_generation.py" which is in the folder named "Data Preparation".
 * Second, run "multi-angled_multi-channel_2D_projections_generation.py" which is in the folder named "Data Preparation".
-* Third, run
+
+[2] Data Pre-processing
