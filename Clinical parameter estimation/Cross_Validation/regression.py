@@ -31,7 +31,7 @@ from create_dataset import prepare_data
 from net_resnet import getPretrainedResNet50
 
 import sys
-sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction')
+sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Clinical parameter estimation')
 from config import parse_args
 from utils import make_dirs, train_regression, validation_regression, plot
 
@@ -40,137 +40,33 @@ import torch.nn as nn
 import torchvision.models as models
 from torchvision.models import densenet121
 
-class AgeResNet(nn.Module):
-    def __init__(self, num_classes):
-        super(AgeResNet, self).__init__()
-        self.resnet = models.resnet50(pretrained=True)
-        self.resnet.conv1 = nn.Conv2d(8, 64, kernel_size=7, stride=2, padding=3, bias=False)
-        self.resnet.fc = nn.Linear(2048, num_classes)
-        
-    def forward(self, x):
-        x = self.resnet(x)
-        return x
-
-class ModifiedDenseNet121(nn.Module):
-    def __init__(self, in_channels, out_units, dropout_rate):
-        super(ModifiedDenseNet121, self).__init__()
-        self.densenet = densenet121(pretrained=True)  # Load the pretrained DenseNet121 model
-        
-        # Modify the first convolution layer to accept the desired number of input channels
-        self.densenet.features.conv0 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
-        
-        # Replace the fully connected layer to output the desired number of units
-        self.densenet.classifier = nn.Linear(1024, out_units)
-
-        # Add dropout layer
-        self.dropout = nn.Dropout(dropout_rate)
-
-        # Apply sigmoid activation to the output to ensure it lies between 0 and 1
-        self.activation = nn.Sigmoid()
-    
-    def forward(self, x):
-        x = self.densenet(x)
-        x = self.activation(x)  # Apply sigmoid activation
-        return x * 84 + 11  # Scale the output to lie between 11 and 95
-
-class WideBasic(nn.Module):
-    def __init__(self, in_planes, planes, stride=1):
-        super(WideBasic, self).__init__()
-        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes)
-            )
-
-    def forward(self, x):
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out += self.shortcut(x)
-        out = self.relu(out)
-        return out
-
-
-class WideResNetRegression(nn.Module):
-    def __init__(self, widen_factor=1, depth=16, num_channels=10, dropout_rate=0.25):
-        super(WideResNetRegression, self).__init__()
-        self.in_planes = 16
-        k = widen_factor
-
-        # Network architecture
-        n = (depth - 4) // 6
-        block = WideBasic
-
-        self.conv1 = nn.Conv2d(num_channels, 16, kernel_size=3, stride=1, padding=1, bias=False)
-        self.layer1 = self._wide_layer(block, 16*k, n, stride=1)
-        self.layer2 = self._wide_layer(block, 32*k, n, stride=2)
-        self.layer3 = self._wide_layer(block, 64*k, n, stride=2)
-        self.bn1 = nn.BatchNorm2d(64*k, momentum=0.9)
-        self.dropout = nn.Dropout(dropout_rate)  # Dropout layer with the specified rate
-        self.linear = nn.Linear(64*k, 1)  # Output a single value for regression
-
-    def _wide_layer(self, block, planes, num_blocks, stride):
-        layers = []
-        layers.append(block(self.in_planes, planes, stride))
-        self.in_planes = planes
-        for _ in range(1, num_blocks):
-            layers.append(block(self.in_planes, planes, stride=1))
-        return nn.Sequential(*layers)
-
-    def forward(self, x):
-        out = self.conv1(x)
-        out = self.layer1(out)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = self.bn1(out)
-        out = torch.mean(out, dim=(2, 3))  # Global average pooling
-        out = self.dropout(out)
-        out = self.linear(out)
-        return out
-
-def huber_loss_function(predictions, targets, delta=5):
-    errors = torch.abs(predictions - targets)
-    quadratic_term = 0.5 * (errors ** 2)
-    linear_term = delta * (errors - 0.5 * delta)
-    loss = torch.where(errors < delta, quadratic_term, linear_term)
-    return loss.mean()
-
 def main(args):
 	#K fold cross validation
 	K = args.K_fold_CV
 	df = pd.read_csv(args.path_df)
-	df = df[df["diagnosis"]!="NEGATIVE"].reset_index(drop=True)
-	df_rot_mips_collages = pd.read_csv(args.path_df_rot_mips_collages)
+	#df = df[df["diagnosis"]!="NEGATIVE"].reset_index(drop=True)
 
-	#df_rot_mips_collages["SUV_MIP"] = df_rot_mips_collages["SUV_MIP"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["SUV_bone"] = df_rot_mips_collages["SUV_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["SUV_lean"] = df_rot_mips_collages["SUV_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["SUV_adipose"] = df_rot_mips_collages["SUV_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["SUV_air"] = df_rot_mips_collages["SUV_air"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages = pd.read_csv(args.path_df_rot_mips)
+	include_angles = [90]
+	df_rot_mips_collages = df_rot_mips_collages[df_rot_mips_collages.angle.isin(include_angles)].reset_index(drop=True)
 
-	#df_rot_mips_collages["CT_MIP"] = df_rot_mips_collages["CT_MIP"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["CT_bone"] = df_rot_mips_collages["CT_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["CT_lean"] = df_rot_mips_collages["CT_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["CT_adipose"] = df_rot_mips_collages["CT_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
-	#df_rot_mips_collages["CT_air"] = df_rot_mips_collages["CT_air"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["SUV_MIP"] = df_rot_mips_collages["SUV_MIP"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["SUV_bone"] = df_rot_mips_collages["SUV_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["SUV_lean"] = df_rot_mips_collages["SUV_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["SUV_adipose"] = df_rot_mips_collages["SUV_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["SUV_air"] = df_rot_mips_collages["SUV_air"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
 
-	#include_angles = [10]
-	#df_rot_mips = df_rot_mips[df_rot_mips.angle.isin(include_angles)].reset_index(drop=True)
+	df_rot_mips_collages["CT_MIP"] = df_rot_mips_collages["CT_MIP"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["CT_bone"] = df_rot_mips_collages["CT_bone"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["CT_lean"] = df_rot_mips_collages["CT_lean"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["CT_adipose"] = df_rot_mips_collages["CT_adipose"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
+	df_rot_mips_collages["CT_air"] = df_rot_mips_collages["CT_air"].str.replace("/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_512_512", "/media/sambit/HDD/Sambit/Projects/Project_6/Outcome_Prediction/Data_Preparation/Output/Multi_directional_2D_MIPs_collages_[0, 90, -45, +45]_512_512")
 
 	path_Output = args.path_CV_Output
 	outcome = args.regression_type[0]
 
 	for k in tqdm(range(K)):
-		if k >= 1:
+		if k >= 0:
 			print("Cross Valdation for fold: {}".format(k))
 			max_epochs = args.max_epochs
 			val_interval = args.validation_interval
@@ -182,7 +78,7 @@ def main(args):
 			device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 			
 			model = DenseNet121(spatial_dims=args.dimensions, in_channels=args.in_channels,
-								out_channels=args.num_classes_age, dropout_prob=0.25).to(device)
+								out_channels=args.num_classes_age, dropout_prob=args.dropout).to(device)
 			#model = WideResNetRegression(widen_factor=6, depth=20, num_channels=10, dropout_rate=0.25).to(device)
 
 			#model = torch.nn.DataParallel(model).to(device)
