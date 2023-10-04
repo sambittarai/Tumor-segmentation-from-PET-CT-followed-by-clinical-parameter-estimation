@@ -62,8 +62,8 @@ class ImageDataset(Dataset):
         CT_adipose_new = torch.unsqueeze(CT_adipose, 0)
         CT_air_new = torch.unsqueeze(CT_air, 0)
 
-        #multi_channel_input = torch.cat((SUV_MIP_new, SUV_bone_new, SUV_lean_new, SUV_adipose_new, SUV_air_new, CT_MIP_new, CT_bone_new, CT_lean_new, CT_adipose_new, CT_air_new), dim=0)
-        multi_channel_input = torch.cat((CT_MIP_new, CT_bone_new, CT_lean_new, CT_adipose_new, CT_air_new), dim=0)
+        multi_channel_input = torch.cat((SUV_MIP_new, SUV_bone_new, SUV_lean_new, SUV_adipose_new, SUV_air_new, CT_MIP_new, CT_bone_new, CT_lean_new, CT_adipose_new, CT_air_new), dim=0)
+        #multi_channel_input = torch.cat((CT_MIP_new, CT_bone_new, CT_lean_new, CT_adipose_new, CT_air_new), dim=0)
         #multi_channel_input = torch.cat((SUV_MIP_new, SUV_bone_new, SUV_lean_new, SUV_adipose_new, SUV_air_new), dim=0)
         #multi_channel_input = torch.cat((SUV_MIP_new, SUV_MIP_new))
 
