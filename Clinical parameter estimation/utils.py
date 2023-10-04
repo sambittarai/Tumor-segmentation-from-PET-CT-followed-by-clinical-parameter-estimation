@@ -267,10 +267,10 @@ def train_regression(model, train_loader, optimizer, loss_function, device, loss
     return epoch_loss, loss_values
 
 def validation_regression(args, k, epoch, optimizer, model, df_val, device, best_metric, metric_values, metric_values_r_squared, path_Output, outcome, loss_function):
-    #df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'prediction (age)'])
+    df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'prediction (age)'])
     #df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'prediction (MTV (ml))'])
     #df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'prediction (lean_volume (L))'])
-    df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'lesion_count'])
+    #df_performance = pd.DataFrame(columns=['pat_ID', 'scan_date', 'GT', 'lesion_count'])
 
     scan_dates = np.unique(df_val["scan_date"])
     prediction = []
@@ -316,10 +316,10 @@ def validation_regression(args, k, epoch, optimizer, model, df_val, device, best
         #print("GT: ", scan_GT)
         #print("Prediction: ", scan_prediction)
 
-        #df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'prediction (age)': [scan_prediction]})
+        df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'prediction (age)': [scan_prediction]})
         #df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'prediction (MTV (ml))': [scan_prediction]})
         #df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'prediction (lean_volume (L))': [scan_prediction]})
-        df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'lesion_count': [scan_prediction]})
+        #df_temp_new = pd.DataFrame({'pat_ID': [pat_id[0]], 'scan_date': [scan_date], 'GT': [scan_GT], 'lesion_count': [scan_prediction]})
 
         df_performance = df_performance.append(df_temp_new, ignore_index=True)
 
@@ -328,12 +328,12 @@ def validation_regression(args, k, epoch, optimizer, model, df_val, device, best
         L1_loss.append(scan_loss)
 
     #metric = np.mean(L1_loss)
-    #metric = mean_absolute_error(np.array(df_performance["GT"]), np.array(df_performance["prediction (age)"]))
+    metric = mean_absolute_error(np.array(df_performance["GT"]), np.array(df_performance["prediction (age)"]))
     #metric = mean_absolute_error(np.array(df_performance["GT"]), np.array(df_performance["prediction (MTV (ml))"]))
     #metric = mean_absolute_error(np.array(df_performance["GT"]), np.array(df_performance["prediction (lean_volume (L))"]))
     #metric = mean_absolute_error(np.array(df_performance["GT"]), np.array(df_performance["lesion_count"]))
 
-    metric = r2_score(np.array(df_performance["GT"]), np.array(df_performance["lesion_count"]))
+    #metric = r2_score(np.array(df_performance["GT"]), np.array(df_performance["lesion_count"]))
 
 
     ##metric_r_squared = r2_score(df_performance["GT"], df_performance["prediction (age)"])
@@ -347,7 +347,7 @@ def validation_regression(args, k, epoch, optimizer, model, df_val, device, best
     #metric_values_r_squared.append(metric_r_squared)
 
     #Save the model if metric is increasing
-    if metric > best_metric:
+    if metric < best_metric:
         best_metric = metric
         save_model(model, epoch, optimizer, k, path_Output)
 
