@@ -1,2 +1,2 @@
-* First, run "multi_channel_SUV_CT_generation.py" in order to generate all the multi-channel SUV and CT inputs which are bone, lean tissue, adipose tissue, air.
+* First, run "multi_channel_3D_SUV_CT_generation.py" in order to generate all the multi-channel SUV and CT inputs which are bone, lean tissue, adipose tissue, air.
 * Then run "multi-angled_multi-channel_2D_projections_generation.py" in order to generate the corresponding projections for all the channels from -90 degrees to +90 degrees with an interval of 10 (You can change this as per your choice) degrees between each of them.
