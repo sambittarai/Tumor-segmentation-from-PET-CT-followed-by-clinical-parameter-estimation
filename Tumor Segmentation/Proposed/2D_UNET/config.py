@@ -6,18 +6,18 @@ def parse_args():
     #################################Common
 
     #Data Path
-    parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/FDG-PET-CT-Lesions", help="Path containing all the Patient's Data.")
+    parser.add_argument("--data_path", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/autoPET_Data/Data", help="Path containing all the Patient's Data.")
 
     #Filtered DataFrame
-    parser.add_argument("--path_df", default="/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Data/DataFrame_with_Paths/df_disease_wise.csv", help="DataFrame containing path of all the patients.")
-    parser.add_argument("--path_df_2D_MIPs", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Data_preparation/Output/df.csv", help="DataFrame containing the patients' without tumors.")
+    parser.add_argument("--path_df", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/autoPET_Data/DataFrame/df_final.csv", help="DataFrame containing path of all the patients.")
+    parser.add_argument("--path_df_2D_MIPs", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Tumor Segmentation/Proposed/2D_UNET/Data_Preprocessing/df_rot_mips.csv", help="DataFrame containing the patients' without tumors.")
 
 
     parser.add_argument("--rotation_min", default=-90, help="Minimum angle by which the MIP will be roated.")
     parser.add_argument("--rotation_max", default=90, help="Maximum angle by which the MIP will be rotated.")
     parser.add_argument("--rotation_interval", default=10, help="Degrees by which the MIP will be rotated each time.")
 
-    parser.add_argument("--path_CV_Output", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Cross_Validation/Output/UNET++/temp", help="Cross Validation Output.")
+    parser.add_argument("--path_CV_Output", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Tumor Segmentation/Proposed/2D_UNET/Cross_Validation/Output", help="Cross Validation Output.")
 
     #Dataloader
     parser.add_argument("--batch_size_train", default=1, help="Batch Size for TrainLoader.") #(MONAI_UNET - 22), (UNET++ - 2)
