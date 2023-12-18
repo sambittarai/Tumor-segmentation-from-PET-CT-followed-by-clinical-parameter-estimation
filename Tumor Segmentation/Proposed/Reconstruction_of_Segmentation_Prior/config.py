@@ -53,8 +53,8 @@ def parse_args():
     parser.add_argument("--pre_trained_weights", default=False, help="If True, then load the pretrained weights to the network.")
 
     #############################Inference
-    parser.add_argument("--path_inference_Output", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Inference/Output/LYMPHOMA", help="Inference Path.")
-    parser.add_argument("--path_TPDMs", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Inference/Output/LYMPHOMA/TPDMs_Data", help="Inference Path.")
+    parser.add_argument("--path_inference_Output", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Tumor Segmentation/Proposed/Reconstruction_of_Segmentation_Prior/Output/Lymphoma", help="Inference Path.")
+    parser.add_argument("--path_TPDMs", default="/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Tumor Segmentation/Proposed/Reconstruction_of_Segmentation_Prior/Output/Segmentation_Prior", help="Inference Path.")
  
     #Best Model's Path
     parser.add_argument("--path_checkpoint_CV_0", default="/media/sambit/HDD/Sambit/Projects/Project_5/Framework/Proposed/2D_UNET/Cross_Validation/Output/UNET++/LYMPHOMA/CV_0/Network_Weights/best_model_13.pth.tar", help="CV_0's best model.")
