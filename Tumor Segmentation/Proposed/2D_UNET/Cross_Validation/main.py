@@ -33,8 +33,8 @@ import Nested_UNET
 #import Nested_UNET_with_regression_head_vanilla
 
 from dynUNET import build_net
-#import sys
-#sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/U-CAN/autoPET_2022/Tumor_Detection/Clean_Code/Proposed/Multi_directional_2D_MIPs')
+import sys
+sys.path.insert(0, '/media/sambit/HDD/Sambit/Projects/Project_5/GitHub/Tumor-segmentation-from-PET-CT-followed-by-outcome-prediction/Tumor Segmentation/Proposed/2D_UNET')
 #import UNET_architectures
 from config import parse_args
 from utils import prepare_df_2D_rot_MIPs, make_dirs, train, validation, plot_dice
